@@ -35,10 +35,10 @@ export class Rect extends Shape {
 }
 
 export class Disk extends Shape {
-    rx(){return this.width() / 2}
-    ry(){return this.height() / 2}
-    cx(){return (this.left() + this.right())/2}
-    cy(){return (this.top() + this.bottom())/2}
+    rx(){return parseInt(this.width() / 2)}
+    ry(){return parseInt(this.height() / 2)}
+    cx(){return parseInt((this.left() + this.right())/2)}
+    cy(){return parseInt((this.top() + this.bottom())/2)}
 
     draw(ctx){
         ctx.save();
