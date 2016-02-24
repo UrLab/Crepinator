@@ -12,6 +12,11 @@ class Shape {
     height(){return this.bottom() - this.top()}
     area(){return this.width() * this.height()}
 
+    overlap(other){
+        return (this.left() <= other.left() && other.left() < this.right()) ||
+               (other.left() <= this.left() && this.left() < other.right());
+    }
+
     changePoint(newPos){
         this.p2 = newPos
         return this

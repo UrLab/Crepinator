@@ -91,6 +91,7 @@ class PancakeDesigner {
                 ctx = this.ctx(),
                 s = this.current_shape;
             ctx.clearRect(s.left(), s.top(), s.width(), s.height())
+            this.shapes.filter(k => s.overlap(k)).map(k => k.draw(ctx))
             s.changePoint(pos).draw(ctx)
         }
     }
