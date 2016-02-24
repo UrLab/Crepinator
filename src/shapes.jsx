@@ -40,16 +40,18 @@ export class Disk extends Shape {
     cy(){return parseInt((this.top() + this.bottom())/2)}
 
     draw(ctx){
-        ctx.save()
-        ctx.beginPath()
-        ctx.translate(this.cx()-this.rx(), this.cy()-this.ry())
-        ctx.scale(this.rx(), this.ry())
-        ctx.arc(1, 1, 1, 0, 2*Math.PI, false)
-        ctx.fill()
-        ctx.restore()
+        if (this.rx() > 0 && this.ry() > 0){
+            ctx.save()
+            ctx.beginPath()
+            ctx.translate(this.cx()-this.rx(), this.cy()-this.ry())
+            ctx.scale(this.rx(), this.ry())
+            ctx.arc(1, 1, 1, 0, 2*Math.PI, false)
+            ctx.fill()
+            ctx.restore()
+        }
     }
 
     svg(){
-        return `<ellipse cx="${this.cx()}" cy="${this.cy()}" rx="${this.rx()}" ry="${this.ry()}">`
+        return `<ellipse cx="${this.cx()}" cy="${this.cy()}" rx="${this.rx()}" ry="${this.ry()}"/>`
     }
 }
