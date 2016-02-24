@@ -34,6 +34,7 @@ class PancakeDesigner {
         $(this.canvas).on('mouseout', evt => this.clickUp(evt))
         root.find('.tool').on('change', evt => this.tool = evt.target.value)
         root.find('.clear').on('click', evt => this.clear())
+        root.find('.undo').on('click', evt => this.undo())
     
         console.info(`Pancake Designer ${this.width}x${this.height} ready !`)
     }
@@ -44,6 +45,11 @@ class PancakeDesigner {
 
     clear(){
         this.shapes = []
+        this.redraw()
+    }
+
+    undo(){
+        this.shapes.pop()
         this.redraw()
     }
 
