@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import {Disk, Rect} from './shapes.jsx';
+import {Disk, Rect, Polyline} from './shapes.jsx';
 
 class Position {
     constructor(x=0, y=0){
@@ -34,6 +34,7 @@ class PancakeDesigner {
         $(this.canvas).on('mouseout', evt => this.clickUp(evt))
         root.find('.tool-rect').on('click', evt => this.tool = "rect")
         root.find('.tool-disk').on('click', evt => this.tool = "disk")
+        root.find('.tool-edit').on('click', evt => this.tool = "edit")
         root.find('.tool-clear').on('click', evt => this.clear())
         root.find('.tool-undo').on('click', evt => this.undo())
     
@@ -77,6 +78,7 @@ class PancakeDesigner {
         switch (this.tool){
             case "rect": this.current_shape = new Rect(pos, pos); break;
             case "disk": this.current_shape = new Disk(pos, pos); break;
+            case "edit": this.current_shape = new Polyline(pos, pos); break;
         }
         this.click = true
     }

@@ -8,10 +8,12 @@
         border: solid 1px #333
   %body
     .container-fluid
-      %h1 Crepinator
       #app
         .panel.panel-default
           .controls.btn-toolbar.panel-heading{role:"toolbar"}
+            %h3 
+              Crepinator
+              %small Draw. Print. Eat. Repeat
             .btn-group{role:"group"}
               %button.btn.btn-primary.tool-rect{type:"button"}
                 %i.glyphicon.glyphicon-stop
@@ -19,6 +21,9 @@
               %button.btn.btn-primary.tool-disk{type:"button"}
                 %i.glyphicon.glyphicon-ban-circle
                 Rond
+              %button.btn.btn-primary.tool-edit{type:"button"}
+                %i.glyphicon.glyphicon-edit
+                Dessin
 
             .btn-group{role:"group"}
               %button.btn.btn-primary.tool-clear{type:"button"}
@@ -31,6 +36,7 @@
           .panel-body
             %canvas{width:800, height:600}
           .panel-footer
+            %h4 SVG
             %pre.svg
     %script{src:"app.js", type:"text/javascript"}
     :javascript

@@ -26,6 +26,42 @@ class Shape {
     draw(ctx){console.error("draw() was called on an abstract Shape !")}
 }
 
+export class Polyline extends Shape {
+    constructor(p1, p2){
+        super(p1, p2)
+        this.points = [p1, p2]
+    }
+
+    right(){return this.points.sort((a,b) => b.x - a.x)[0].x}
+    left(){return this.points.sort((a,b) => a.x - b.x)[0].x}
+    bottom(){return this.points.sort((a,b) => b.y - a.y)[0].y}
+    top(){return this.points.sort((a,b) => a.y - b.y)[0].y}
+
+    changePoint(newPos){
+        this.points.push(newPos)
+        return this
+    }
+
+    draw(ctx){
+        ctx.save()
+        ctx.beginPath()
+        ctx.lineWidth = 10
+        this.points.map((p, i) => {
+            if (i == 0){
+                ctx.moveTo(p.x, p.y)
+            } else {
+                ctx.lineTo(p.x, p.y)
+            }
+        });
+        ctx.stroke()
+        ctx.restore()
+    }
+
+    svg(){
+        return "PROUT"
+    }
+}
+
 export class Rect extends Shape {
     draw(ctx){
         ctx.beginPath()
