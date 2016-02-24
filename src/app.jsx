@@ -18,6 +18,8 @@ class PancakeDesigner {
         this.canvas = root.find('canvas')[0]
         this.width = $(this.canvas).attr('width')
         this.height = $(this.canvas).attr('height')
+        this.texture = new Image()
+        this.texture.src = "texture.jpg"
 
         /* Mouse gesture events */
         this.tool = "rect"
@@ -58,7 +60,7 @@ class PancakeDesigner {
     redraw(){
         let ctx = this.ctx()
         ctx.clearRect(0, 0, this.width, this.height)
-        this.shapes.map(s => s.draw(ctx))
+        this.shapes.map(s => s.textureDraw(ctx, this.texture))
         this.root.find('.svg').text(this.svg())
     }
 
@@ -100,8 +102,8 @@ class PancakeDesigner {
                 ctx = this.ctx(),
                 s = this.current_shape;
             ctx.clearRect(s.left(), s.top(), s.width(), s.height())
-            this.shapes.filter(k => s.overlap(k)).map(k => k.draw(ctx))
-            s.changePoint(pos).draw(ctx)
+            this.shapes.filter(k => s.overlap(k)).map(k => k.textureDraw(ctx, this.texture))
+            s.changePoint(pos).textureDraw(ctx, this.texture)
         }
     }
 }

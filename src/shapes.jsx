@@ -22,8 +22,32 @@ class Shape {
         return this
     }
 
+    _fill(ctx){
+        ctx.fill()
+    }
+
+    _makePath(ctx){
+        console.error("_makePath() was called on an abstract Shape !")
+    }
+
     svg(){console.error("svg() was called on an abstract Shape !")}
-    draw(ctx){console.error("draw() was called on an abstract Shape !")}
+    
+    draw(ctx){
+        ctx.save()
+        ctx.beginPath()
+        this._makePath(ctx)
+        this._fill(ctx)
+        ctx.restore()
+    }
+
+    textureDraw(ctx, texture){
+        ctx.save()
+        ctx.beginPath()
+        this._makePath(ctx)
+        ctx.clip()
+        ctx.drawImage(texture, 0, 0);
+        ctx.restore()
+    }
 }
 
 export class Polyline extends Shape {
@@ -42,10 +66,12 @@ export class Polyline extends Shape {
         return this
     }
 
-    draw(ctx){
-        ctx.save()
-        ctx.beginPath()
+    _fill(ctx){
         ctx.lineWidth = 10
+        ctx.stroke()
+    }
+
+    _makePath(ctx){
         this.points.map((p, i) => {
             if (i == 0){
                 ctx.moveTo(p.x, p.y)
@@ -53,8 +79,6 @@ export class Polyline extends Shape {
                 ctx.lineTo(p.x, p.y)
             }
         });
-        ctx.stroke()
-        ctx.restore()
     }
 
     svg(){
@@ -63,10 +87,8 @@ export class Polyline extends Shape {
 }
 
 export class Rect extends Shape {
-    draw(ctx){
-        ctx.beginPath()
+    _makePath(ctx){
         ctx.rect(this.left(), this.top(), this.width(), this.height())
-        ctx.fill()
     }
 
     svg(){
@@ -80,15 +102,11 @@ export class Disk extends Shape {
     cx(){return parseInt((this.left() + this.right())/2)}
     cy(){return parseInt((this.top() + this.bottom())/2)}
 
-    draw(ctx){
+    _makePath(ctx){
         if (this.rx() > 0 && this.ry() > 0){
-            ctx.save()
-            ctx.beginPath()
             ctx.translate(this.cx()-this.rx(), this.cy()-this.ry())
             ctx.scale(this.rx(), this.ry())
             ctx.arc(1, 1, 1, 0, 2*Math.PI, false)
-            ctx.fill()
-            ctx.restore()
         }
     }
 
