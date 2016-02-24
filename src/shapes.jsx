@@ -51,9 +51,10 @@ class Shape {
 }
 
 export class Polyline extends Shape {
-    constructor(p1, p2){
-        super(p1, p2)
+    constructor(p1, p2, linewidth=25){
+        super(undefined, undefined)
         this.points = [p1, p2]
+        this.lw = linewidth
     }
 
     right(){return this.points.sort((a,b) => b.x - a.x)[0].x}
@@ -67,18 +68,20 @@ export class Polyline extends Shape {
     }
 
     _fill(ctx){
-        ctx.lineWidth = 10
+        ctx.lineWidth = this.lw
         ctx.stroke()
     }
 
     _makePath(ctx){
-        this.points.map((p, i) => {
-            if (i == 0){
-                ctx.moveTo(p.x, p.y)
-            } else {
-                ctx.lineTo(p.x, p.y)
-            }
-        });
+        var p = this.points[0]
+        ctx.moveTo(p.x, p.y)
+
+        let l = this.points.length
+        for (var i=1; i<l; i++){
+            var q = this.points[i];
+            ctx.lineTo(q.x, q.y)
+            p = q
+        }
     }
 
     svg(){

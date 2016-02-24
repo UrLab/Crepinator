@@ -7,6 +7,8 @@
       canvas
         border: solid 1px #333
         cursor: crosshair
+        margin: auto
+        position: center
   %body
     .container-fluid
       #app
@@ -16,21 +18,26 @@
               Crepinator
               %small Draw. Print. Eat. Repeat
             .btn-group{role:"group"}
-              %button.btn.btn-primary.tool-rect{type:"button"}
+              %button.btn.btn-default.tool-rect{type:"button"}
                 %i.glyphicon.glyphicon-stop
                 Rectangle
-              %button.btn.btn-primary.tool-disk{type:"button"}
+              %button.btn.btn-default.tool-disk{type:"button"}
                 %i.glyphicon.glyphicon-ban-circle
                 Rond
-              %button.btn.btn-primary.tool-edit{type:"button"}
+              %button.btn.btn-default.dropdown-toggle{type:"button", 'data-toggle' => "dropdown"}
                 %i.glyphicon.glyphicon-edit
-                Dessin
+                Dessiner
+                %span.caret
+              %ul.dropdown-menu
+                - [25, 50, 100].each do |x|
+                  %li{class:"tool-pen#{x}"}
+                    %a{href:"#"} Crayon de #{x}px
 
             .btn-group{role:"group"}
-              %button.btn.btn-primary.tool-clear{type:"button"}
+              %button.btn.btn-default.tool-clear{type:"button"}
                 %i.glyphicon.glyphicon-trash
                 Effacer
-              %button.btn.btn-primary.tool-undo{type:"button"}
+              %button.btn.btn-default.tool-undo{type:"button"}
                 %i.glyphicon.glyphicon-menu-left
                 Annuler
 
@@ -39,6 +46,7 @@
           .panel-footer
             %h4 SVG
             %pre.svg
-    %script{src:"app.js", type:"text/javascript"}
+    %script{src:"app.js", type:"text/javascript"}            
+    %script{src:"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", integrity:"sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS", crossorigin:"anonymous"}
     :javascript
       var yoloSWAG = new PancakeDesigner($('#app'))

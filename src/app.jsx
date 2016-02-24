@@ -7,6 +7,20 @@ class Position {
         this.y = parseInt(y, 10)
     }
 
+    dist(other){
+        let dx = this.x - other.x,
+            dy = this.y - other.y;
+        return Math.sqrt(dx*dx + dy*dy)
+    }
+
+    add(other){
+        return new Position(this.x + other.x, this.y + other.y)
+    }
+
+    sub(other){
+        return new Position(this.x - other.x, this.y - other.y)
+    }
+
     str(){
         return `(${this.x} ${this.y})`
     }
@@ -33,10 +47,11 @@ class PancakeDesigner {
         $(this.canvas).on('mousedown', evt => this.clickDown(evt))
         $(this.canvas).on('mousemove', evt => this.move(evt))
         $(this.canvas).on('mouseup', evt => this.clickUp(evt))
-        $(this.canvas).on('mouseout', evt => this.clickUp(evt))
-        root.find('.tool-rect').on('click', evt => this.tool = "rect")
-        root.find('.tool-disk').on('click', evt => this.tool = "disk")
-        root.find('.tool-edit').on('click', evt => this.tool = "edit")
+        $(this.canvas).on('mouseout', evt => this.clickUp(evt));
+        
+        ['rect', 'disk', 'pen25', 'pen50', 'pen100'].map(t => {
+            root.find(`.tool-${t}`).on('click', evt => this.tool = t)
+        });
         root.find('.tool-clear').on('click', evt => this.clear())
         root.find('.tool-undo').on('click', evt => this.undo())
     
@@ -80,7 +95,9 @@ class PancakeDesigner {
         switch (this.tool){
             case "rect": this.current_shape = new Rect(pos, pos); break;
             case "disk": this.current_shape = new Disk(pos, pos); break;
-            case "edit": this.current_shape = new Polyline(pos, pos); break;
+            case "pen25": this.current_shape = new Polyline(pos, pos, 25); break;
+            case "pen50": this.current_shape = new Polyline(pos, pos, 50); break;
+            case "pen100": this.current_shape = new Polyline(pos, pos, 100); break;
         }
         this.click = true
     }
@@ -109,4 +126,5 @@ class PancakeDesigner {
 }
 
 window.$ = $
+window.jQuery = $
 window.PancakeDesigner = PancakeDesigner
