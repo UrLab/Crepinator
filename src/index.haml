@@ -2,20 +2,36 @@
 %html
   %head
     %meta{charset:"utf-8"}
+    %link{rel:"stylesheet", href:"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css", integrity:"sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7", crossorigin:"anonymous"}
     :sass
       canvas
         border: solid 1px #333
   %body
-    %h1 Crepinator
-    #app
-      .controls
-        %select.tool{value:"rect"}
-          %option{value:"rect"} Rectangle
-          %option{value:"circle"} Rond
-        %button.clear Effacer
-        %button.undo Annuler
-      %canvas{width:800, height:600}
-      %pre.svg
+    .container-fluid
+      %h1 Crepinator
+      #app
+        .panel.panel-default
+          .controls.btn-toolbar.panel-heading{role:"toolbar"}
+            .btn-group{role:"group"}
+              %button.btn.btn-primary.tool-rect{type:"button"}
+                %i.glyphicon.glyphicon-stop
+                Rectangle
+              %button.btn.btn-primary.tool-disk{type:"button"}
+                %i.glyphicon.glyphicon-ban-circle
+                Rond
+
+            .btn-group{role:"group"}
+              %button.btn.btn-primary.tool-clear{type:"button"}
+                %i.glyphicon.glyphicon-trash
+                Effacer
+              %button.btn.btn-primary.tool-undo{type:"button"}
+                %i.glyphicon.glyphicon-menu-left
+                Annuler
+
+          .panel-body
+            %canvas{width:800, height:600}
+          .panel-footer
+            %pre.svg
     %script{src:"app.js", type:"text/javascript"}
     :javascript
       var yoloSWAG = new PancakeDesigner($('#app'))

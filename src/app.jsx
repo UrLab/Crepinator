@@ -20,7 +20,7 @@ class PancakeDesigner {
         this.height = $(this.canvas).attr('height')
 
         /* Mouse gesture events */
-        this.tool = this.root.find('.tool')[0].value
+        this.tool = "rect"
         this.click = false
 
         /* Graphics */
@@ -32,9 +32,10 @@ class PancakeDesigner {
         $(this.canvas).on('mousemove', evt => this.move(evt))
         $(this.canvas).on('mouseup', evt => this.clickUp(evt))
         $(this.canvas).on('mouseout', evt => this.clickUp(evt))
-        root.find('.tool').on('change', evt => this.tool = evt.target.value)
-        root.find('.clear').on('click', evt => this.clear())
-        root.find('.undo').on('click', evt => this.undo())
+        root.find('.tool-rect').on('click', evt => this.tool = "rect")
+        root.find('.tool-disk').on('click', evt => this.tool = "disk")
+        root.find('.tool-clear').on('click', evt => this.clear())
+        root.find('.tool-undo').on('click', evt => this.undo())
     
         console.info(`Pancake Designer ${this.width}x${this.height} ready !`)
     }
@@ -57,6 +58,7 @@ class PancakeDesigner {
         let ctx = this.ctx()
         ctx.clearRect(0, 0, this.width, this.height)
         this.shapes.map(s => s.draw(ctx))
+        this.root.find('.svg').text(this.svg())
     }
 
     svg(){
@@ -73,8 +75,8 @@ class PancakeDesigner {
     clickDown(evt){
         let pos = this.getMousePos(evt);
         switch (this.tool){
-            case "rect":   this.current_shape = new Rect(pos, pos); break;
-            case "circle": this.current_shape = new Disk(pos, pos); break;
+            case "rect": this.current_shape = new Rect(pos, pos); break;
+            case "disk": this.current_shape = new Disk(pos, pos); break;
         }
         this.click = true
     }
@@ -86,8 +88,7 @@ class PancakeDesigner {
             }
             this.click = false
             this.current_shape = undefined
-            this.redraw(this.ctx())
-            this.root.find('.svg').text(this.svg())
+            this.redraw()
         }
     }
 
