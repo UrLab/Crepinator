@@ -8,4 +8,13 @@
   %body
     %h1 Crepinator
     #app
+      .controls
+        %select.tool{value:"rect"}
+          %option{value:"rect"} Rectangle
+          %option{value:"circle"} Rond
+        %button.clear Effacer
+      %canvas{width:800, height:600}
+      %pre.svg
     %script{src:"app.js", type:"text/javascript"}
+    :javascript
+      var yoloSWAG = new PancakeDesigner($('#app'), {width: 800, height: 600})

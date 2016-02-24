@@ -1,111 +1,94 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import {Disk, Rect} from './shapes.jsx';
 
-class PancakeDesigner extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            tool: 'rect',
-            click: {on: false, x: 0, y: 0},
-            move: {x: 0, y: 0},
-            current_shape: undefined,
-            shapes: [],
-            svg: ""
-        };
+class Position {
+    constructor(x=0, y=0){
+        this.x = parseInt(x, 10)
+        this.y = parseInt(y, 10)
     }
 
-    redraw(ctx){
-        ctx.clearRect(0, 0, this.props.width, this.props.height);
-        this.state.shapes.map(s => s.draw(ctx));
+    str(){
+        return `(${this.x} ${this.y})`
+    }
+}
+
+class PancakeDesigner {
+    constructor(root) {
+        this.root = root
+        this.canvas = root.find('canvas')[0]
+        this.width = $(this.canvas).attr('width')
+        this.height = $(this.canvas).attr('height')
+
+        /* Mouse gesture events */
+        this.tool = this.root.find('.tool')[0].value
+        this.click = false
+
+        /* Graphics */
+        this.current_shape = undefined
+        this.shapes = []
+        
+        /* Install events */
+        $(this.canvas).on('mousedown', evt => this.clickDown(evt))
+        $(this.canvas).on('mousemove', evt => this.move(evt))
+        $(this.canvas).on('mouseup', evt => this.clickUp(evt))
+        $(this.canvas).on('mouseout', evt => this.clickUp(evt))
+        root.find('.tool').on('change', evt => this.tool = evt.target.value)
+    
+        console.info(`Pancake Designer ${this.width}x${this.height} ready !`)
+    }
+
+    ctx(){
+        return this.canvas.getContext('2d')
+    }
+
+    redraw(){
+        let ctx = this.ctx()
+        ctx.clearRect(0, 0, this.width, this.height)
+        this.shapes.map(s => s.draw(ctx))
     }
 
     svg(){
-        let shapes = this.state.shapes.map(s => s.svg()).join('\n');
-        return `<svg width="${this.props.width}" height="${this.props.height}">${shapes}</svg>`
+        let shapes = this.shapes.map(s => s.svg()).join('\n');
+        return `<svg width="${this.width}" height="${this.height}">${shapes}</svg>`
     }
 
     getMousePos(evt){
-        let canvas = evt.target;
-        let rect = canvas.getBoundingClientRect();
-        return {
-            x: parseInt(evt.clientX - rect.left),
-            y: parseInt (evt.clientY - rect.top)
-        }
+        let rect = this.canvas.getBoundingClientRect();
+        let res = new Position(evt.clientX-rect.left, evt.clientY-rect.top)
+        return res
     }
 
     clickDown(evt){
         let pos = this.getMousePos(evt);
-        let newShape;
-        switch (this.state.tool){
-            case "rect":   newShape = new Rect(pos, pos); break;
-            case "circle": newShape = new Disk(pos, pos); break;
+        switch (this.tool){
+            case "rect":   this.current_shape = new Rect(pos, pos); break;
+            case "circle": this.current_shape = new Disk(pos, pos); break;
         }
-        this.setState({
-            click: {on: true, x: pos.x, y: pos.y},
-            move: pos,
-            current_shape: newShape
-        }); 
+        this.click = true
     }
 
     clickUp(evt){
-        if (! this.state.click.on){return;}
-
-        let pos = this.getMousePos(evt);
-        let ctx = evt.target.getContext('2d');
-        this.state.current_shape.draw(ctx);
-
-        let shapes = this.state.shapes;
-        shapes.push(this.state.current_shape);
-
-        this.setState({
-            click: {on: false, x: pos.x, y: pos.y},
-            shapes: shapes,
-            current_shape: undefined
-        });
-        this.redraw(ctx);
+        if (this.click){
+            if (this.current_shape.area() > 1){
+                this.shapes.push(this.current_shape)
+            }
+            this.click = false
+            this.current_shape = undefined
+            this.redraw(this.ctx())
+            this.root.find('.svg').text(this.svg())
+        }
     }
 
     move(evt){
-        /* Not holding the mouse, do nothing */
-        if (! this.state.click.on){return;}
-
-        /* Where the click ? */
-        let pos = this.getMousePos(evt);
-        let ctx = evt.target.getContext('2d');
-
-        let s = this.state.current_shape;
-        ctx.clearRect(s.left(), s.top(), s.width(), s.height());
-        this.setState({
-            move: pos,
-            current_shape: s.changeMax(pos)
-        });
-        this.state.current_shape.draw(ctx);
-    }
-    
-    render(){
-        return <div>
-            <div>
-                <select value={this.state.tool}
-                        onChange={evt => this.setState({tool: evt.target.value})}>
-                    <option value="rect">Rectangle</option>
-                    <option value="circle">Rond</option>
-                </select>
-            </div>
-            <canvas width={this.props.width} height={this.props.height}
-                    onMouseDown={evt => this.clickDown(evt)}
-                    onMouseUp={evt => this.clickUp(evt)}
-                    onMouseOut={evt => this.clickUp(evt)}
-                    onMouseMove={evt => this.move(evt)}>
-            </canvas>
-            <hr/>
-            <pre>{this.svg()}</pre>
-        </div>
+        if (this.click){
+            let pos = this.getMousePos(evt),
+                ctx = this.ctx(),
+                s = this.current_shape;
+            ctx.clearRect(s.left(), s.top(), s.width(), s.height())
+            s.changePoint(pos).draw(ctx)
+        }
     }
 }
 
-$(document).ready(() => {
-    ReactDOM.render(<PancakeDesigner width={800} height={600}/>,
-                    document.getElementById('app'));
-});
+window.$ = $
+window.PancakeDesigner = PancakeDesigner

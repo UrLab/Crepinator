@@ -8,12 +8,9 @@
     "devDependencies": {
         "babel-cli": "^6.0.0",
         "babel-preset-es2015": "",
-        "babel-preset-react": "",
         "babel-polyfill": "",
         "babel-plugin-transform-runtime": "",
         "babel-loader": "",
-        "react": "",
-        "react-dom": "",
         "jquery": "",
         "webpack": "",
         "webpack-dev-server": ""
