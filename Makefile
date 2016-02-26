@@ -9,7 +9,7 @@ clean:
 ${NODE}: package.json
 	npm install
 
-static/app.js: src/*.jsx ${NODE}
+static/app.js: src/*.js ${NODE}
 	npm run build
 
 static/%.html: src/%.haml

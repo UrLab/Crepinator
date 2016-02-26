@@ -1,30 +1,8 @@
 import $ from 'jquery';
-import {Disk, Rect, Polyline} from './shapes.jsx';
+import {Point} from './point.js';
+import {Disk, Rect} from './shapes.js';
+import {Drawing} from './draw.js';
 
-class Position {
-    constructor(x=0, y=0){
-        this.x = parseInt(x, 10)
-        this.y = parseInt(y, 10)
-    }
-
-    dist(other){
-        let dx = this.x - other.x,
-            dy = this.y - other.y;
-        return Math.sqrt(dx*dx + dy*dy)
-    }
-
-    add(other){
-        return new Position(this.x + other.x, this.y + other.y)
-    }
-
-    sub(other){
-        return new Position(this.x - other.x, this.y - other.y)
-    }
-
-    str(){
-        return `(${this.x} ${this.y})`
-    }
-}
 
 class PancakeDesigner {
     constructor(root) {
@@ -52,7 +30,10 @@ class PancakeDesigner {
         ['rect', 'disk', 'pen25', 'pen50', 'pen100'].map(t => {
             root.find(`.tool-${t}`).on('click', evt => this.tool = t)
         });
-        root.find('.tool-clear').on('click', evt => this.clear())
+        root.find('.tool-clear').on('click', evt => {
+            if (confirm("Effacer le dessin ?")){this.clear()}
+        })
+        root.find('.tool-print').on('click', this.stl())
         root.find('.tool-undo').on('click', evt => this.undo())
     
         console.info(`Pancake Designer ${this.width}x${this.height} ready !`)
@@ -76,18 +57,23 @@ class PancakeDesigner {
         let ctx = this.ctx()
         ctx.clearRect(0, 0, this.width, this.height)
         this.shapes.map(s => s.textureDraw(ctx, this.texture))
-        this.root.find('.svg').text(this.svg())
     }
 
-    svg(){
-        let shapes = this.shapes.map(s => s.svg()).join('\n');
-        return `<svg width="${this.width}" height="${this.height}">${shapes}</svg>`
+    stl(){
+        let img = this.ctx().getImageData(0, 0, this.width, this.height)
+        window.img = img
+    }
+
+    print(){
+        var name = "";
+        while (name.trim().length == 0){
+            name = prompt("Nomme ta crèpe")
+        }
     }
 
     getMousePos(evt){
         let rect = this.canvas.getBoundingClientRect();
-        let res = new Position(evt.clientX-rect.left, evt.clientY-rect.top)
-        return res
+        return new Point(evt.clientX-rect.left, evt.clientY-rect.top)
     }
 
     clickDown(evt){
@@ -95,9 +81,9 @@ class PancakeDesigner {
         switch (this.tool){
             case "rect": this.current_shape = new Rect(pos, pos); break;
             case "disk": this.current_shape = new Disk(pos, pos); break;
-            case "pen25": this.current_shape = new Polyline(pos, pos, 25); break;
-            case "pen50": this.current_shape = new Polyline(pos, pos, 50); break;
-            case "pen100": this.current_shape = new Polyline(pos, pos, 100); break;
+            case "pen25": this.current_shape = new Drawing(pos, 25); break;
+            case "pen50": this.current_shape = new Drawing(pos, 50); break;
+            case "pen100": this.current_shape = new Drawing(pos, 100); break;
         }
         this.click = true
     }
@@ -118,8 +104,11 @@ class PancakeDesigner {
             let pos = this.getMousePos(evt),
                 ctx = this.ctx(),
                 s = this.current_shape;
-            ctx.clearRect(s.left(), s.top(), s.width(), s.height())
-            this.shapes.filter(k => s.overlap(k)).map(k => k.textureDraw(ctx, this.texture))
+            if (s.needRedraw()){
+                ctx.clearRect(s.left(), s.top(), s.width(), s.height())
+                this.shapes.filter(k => s.overlap(k))
+                           .map(k => k.textureDraw(ctx, this.texture))
+            }
             s.changePoint(pos).textureDraw(ctx, this.texture)
         }
     }

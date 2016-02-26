@@ -3,6 +3,7 @@
   %head
     %meta{charset:"utf-8"}
     %link{rel:"stylesheet", href:"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css", integrity:"sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7", crossorigin:"anonymous"}
+    %link{rel:"stylesheet", href:"https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}
     :sass
       canvas
         border: solid 1px #333
@@ -18,34 +19,51 @@
               Crepinator
               %small Draw. Print. Eat. Repeat
             .btn-group{role:"group"}
-              %button.btn.btn-default.tool-rect{type:"button"}
-                %i.glyphicon.glyphicon-stop
-                Rectangle
-              %button.btn.btn-default.tool-disk{type:"button"}
-                %i.glyphicon.glyphicon-ban-circle
-                Rond
-              %button.btn.btn-default.dropdown-toggle{type:"button", 'data-toggle' => "dropdown"}
-                %i.glyphicon.glyphicon-edit
-                Dessiner
+              %button.btn.btn-default.dropdown-toggle{title: "Dessiner", type:"button", 'data-toggle' => "dropdown"}
+                %i.fa.fa-pencil
                 %span.caret
               %ul.dropdown-menu
-                - [25, 50, 100].each do |x|
-                  %li{class:"tool-pen#{x}"}
-                    %a{href:"#"} Crayon de #{x}px
+                %li{class:"tool-pen25"}
+                  %a{href:"#"}
+                    %i.fa.fa-circle
+                %li.divider{role:"separator"}
+                %li{class:"tool-pen50"}
+                  %a{href:"#"}
+                    %i.fa.fa-circle.fa-2x
+                %li.divider{role:"separator"}
+                %li{class:"tool-pen100"}
+                  %a{href:"#"}
+                    %i.fa.fa-circle.fa-4x
+            
+            .btn-group{role:"group"}
+              %button.btn.btn-default.dropdown-toggle{title: "Formes", type:"button", 'data-toggle' => "dropdown"}
+                %i.fa.fa-cube
+                %span.caret
+              %ul.dropdown-menu
+                %li.tool-disk
+                  %a{href:"#"}
+                    %i.fa.fa-circle
+                    Rond
+                %li.tool-rect
+                  %a{href:"#"}
+                    %i.fa.fa-square
+                    Rectangle
 
             .btn-group{role:"group"}
-              %button.btn.btn-default.tool-clear{type:"button"}
-                %i.glyphicon.glyphicon-trash
-                Effacer
-              %button.btn.btn-default.tool-undo{type:"button"}
-                %i.glyphicon.glyphicon-menu-left
-                Annuler
+              %button.btn.btn-default.tool-clear{title: "Effacer", type:"button"}
+                %i.fa.fa-trash
+              %button.btn.btn-default.tool-undo{title: "Annuler", type:"button"}
+                %i.fa.fa-undo
+              %button.btn.btn-default.tool-print{title: "Imprimer", type: "button"}
+                %i.fa.fa-printer
 
           .panel-body
             %canvas{width:800, height:600}
           .panel-footer
-            %h4 SVG
-            %pre.svg
+            Made with
+            %i.fa.fa-heart
+            at
+            %a{href:"https://urlab.be", target:"_blank"} UrLab
     %script{src:"app.js", type:"text/javascript"}            
     %script{src:"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", integrity:"sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS", crossorigin:"anonymous"}
     :javascript

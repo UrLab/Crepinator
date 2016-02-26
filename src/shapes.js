@@ -1,3 +1,5 @@
+import Point from './point.js'
+
 class Shape {
     constructor(p1, p2){
         this.p1 = p1
@@ -22,21 +24,19 @@ class Shape {
         return this
     }
 
-    _fill(ctx){
-        ctx.fill()
-    }
-
     _makePath(ctx){
         console.error("_makePath() was called on an abstract Shape !")
     }
-
-    svg(){console.error("svg() was called on an abstract Shape !")}
     
+    needRedraw(){
+        return true
+    }
+
     draw(ctx){
         ctx.save()
         ctx.beginPath()
         this._makePath(ctx)
-        this._fill(ctx)
+        ctx.fill()
         ctx.restore()
     }
 
@@ -50,52 +50,9 @@ class Shape {
     }
 }
 
-export class Polyline extends Shape {
-    constructor(p1, p2, linewidth=25){
-        super(undefined, undefined)
-        this.points = [p1, p2]
-        this.lw = linewidth
-    }
-
-    right(){return this.points.sort((a,b) => b.x - a.x)[0].x}
-    left(){return this.points.sort((a,b) => a.x - b.x)[0].x}
-    bottom(){return this.points.sort((a,b) => b.y - a.y)[0].y}
-    top(){return this.points.sort((a,b) => a.y - b.y)[0].y}
-
-    changePoint(newPos){
-        this.points.push(newPos)
-        return this
-    }
-
-    _fill(ctx){
-        ctx.lineWidth = this.lw
-        ctx.stroke()
-    }
-
-    _makePath(ctx){
-        var p = this.points[0]
-        ctx.moveTo(p.x, p.y)
-
-        let l = this.points.length
-        for (var i=1; i<l; i++){
-            var q = this.points[i];
-            ctx.lineTo(q.x, q.y)
-            p = q
-        }
-    }
-
-    svg(){
-        return "PROUT"
-    }
-}
-
 export class Rect extends Shape {
     _makePath(ctx){
         ctx.rect(this.left(), this.top(), this.width(), this.height())
-    }
-
-    svg(){
-        return `<rect x="${this.left()}" y="${this.top()}" width="${this.width()} height=${this.height()}"/>`
     }
 }
 
@@ -107,13 +64,11 @@ export class Disk extends Shape {
 
     _makePath(ctx){
         if (this.rx() > 0 && this.ry() > 0){
+            ctx.save()
             ctx.translate(this.cx()-this.rx(), this.cy()-this.ry())
             ctx.scale(this.rx(), this.ry())
             ctx.arc(1, 1, 1, 0, 2*Math.PI, false)
+            ctx.restore()
         }
-    }
-
-    svg(){
-        return `<ellipse cx="${this.cx()}" cy="${this.cy()}" rx="${this.rx()}" ry="${this.ry()}"/>`
     }
 }
