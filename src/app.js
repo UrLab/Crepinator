@@ -3,7 +3,6 @@ import {Point} from './point.js';
 import {Disk, Rect} from './shapes.js';
 import {Drawing} from './draw.js';
 
-
 class PancakeDesigner {
     constructor(root) {
         this.root = root
@@ -61,16 +60,21 @@ class PancakeDesigner {
 
     stl(){
         let img = this.ctx().getImageData(0, 0, this.width, this.height)
-        let cubes = []
-        for (var x=0; x<this.width; x++){
-            for (var y=0; y<this.height; y++){
-                let n = 4 * (y*this.width + x) + 3
-                if (img.data[n] > 0){
-                    cubes.push([x, y])
+        let n = img.data.length
+        let m = parseInt(n/8)
+        if (n % 8 > 0){m++}
+        let res = new Array(m)
+        for (var i=0; i<m; i++){
+            var k = 0
+            for (var j=0; j<8 || m*8+j < n; j++){
+                k <<= 1
+                if (img.data[i*32 + j*4 + 3] > 0){
+                    k += 1
                 }
             }
+            res[i] = k
         }
-        console.log(JSON.stringify(cubes))
+        $('#output').text(JSON.stringify(res))
     }
 
     print(){
