@@ -14,7 +14,7 @@ class PancakeDesigner {
         this.texture.src = "texture.jpg"
 
         /* Mouse gesture events */
-        this.tool = "rect"
+        this.tool = "pen42"
         this.click = false
 
         /* Graphics */
@@ -27,13 +27,13 @@ class PancakeDesigner {
         $(this.canvas).on('mouseup', evt => this.clickUp(evt))
         $(this.canvas).on('mouseout', evt => this.clickUp(evt));
         
-        ['rect', 'disk', 'pen25', 'pen50', 'pen100'].map(t => {
+        ['rect', 'disk', 'pen14', 'pen28', 'pen42', 'pen56', 'pen70'].map(t => {
             root.find(`.tool-${t}`).on('click', evt => this.tool = t)
         });
         root.find('.tool-clear').on('click', evt => {
             if (confirm("Effacer le dessin ?")){this.clear()}
         })
-        root.find('.tool-print').on('click', this.stl())
+        root.find('.tool-print').on('click', evt => this.stl())
         root.find('.tool-undo').on('click', evt => this.undo())
     
         console.info(`Pancake Designer ${this.width}x${this.height} ready !`)
@@ -61,7 +61,16 @@ class PancakeDesigner {
 
     stl(){
         let img = this.ctx().getImageData(0, 0, this.width, this.height)
-        window.img = img
+        let cubes = []
+        for (var x=0; x<this.width; x++){
+            for (var y=0; y<this.height; y++){
+                let n = 4 * (y*this.width + x) + 3
+                if (img.data[n] > 0){
+                    cubes.push([x, y])
+                }
+            }
+        }
+        console.log(JSON.stringify(cubes))
     }
 
     print(){
@@ -79,11 +88,13 @@ class PancakeDesigner {
     clickDown(evt){
         let pos = this.getMousePos(evt);
         switch (this.tool){
-            case "rect": this.current_shape = new Rect(pos, pos); break;
-            case "disk": this.current_shape = new Disk(pos, pos); break;
-            case "pen25": this.current_shape = new Drawing(pos, 25); break;
-            case "pen50": this.current_shape = new Drawing(pos, 50); break;
-            case "pen100": this.current_shape = new Drawing(pos, 100); break;
+            case "rect":  this.current_shape = new Rect(pos, pos); break;
+            case "disk":  this.current_shape = new Disk(pos, pos); break;
+            case "pen14": this.current_shape = new Drawing(pos, 14); break;
+            case "pen28": this.current_shape = new Drawing(pos, 28); break;
+            case "pen42": this.current_shape = new Drawing(pos, 42); break;
+            case "pen56": this.current_shape = new Drawing(pos, 56); break;
+            case "pen70": this.current_shape = new Drawing(pos, 70); break;
         }
         this.click = true
     }

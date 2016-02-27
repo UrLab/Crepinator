@@ -19,24 +19,33 @@
               Crepinator
               %small Draw. Print. Eat. Repeat
             .btn-group{role:"group"}
-              %button.btn.btn-default.dropdown-toggle{title: "Dessiner", type:"button", 'data-toggle' => "dropdown"}
+              %button.btn.btn-primary.dropdown-toggle{title: "Dessiner", type:"button", 'data-toggle' => "dropdown"}
                 %i.fa.fa-pencil
                 %span.caret
               %ul.dropdown-menu
-                %li{class:"tool-pen25"}
+                %li{class:"tool-pen14"}
                   %a{href:"#"}
                     %i.fa.fa-circle
                 %li.divider{role:"separator"}
-                %li{class:"tool-pen50"}
+                %li{class:"tool-pen28"}
                   %a{href:"#"}
                     %i.fa.fa-circle.fa-2x
                 %li.divider{role:"separator"}
-                %li{class:"tool-pen100"}
+                %li{class:"tool-pen42"}
+                  %a{href:"#"}
+                    %i.fa.fa-circle.fa-3x
+                %li.divider{role:"separator"}
+                %li{class:"tool-pen56"}
                   %a{href:"#"}
                     %i.fa.fa-circle.fa-4x
+                %li.divider{role:"separator"}
+                %li{class:"tool-pen70"}
+                  %a{href:"#"}
+                    %i.fa.fa-circle.fa-5x
+
             
             .btn-group{role:"group"}
-              %button.btn.btn-default.dropdown-toggle{title: "Formes", type:"button", 'data-toggle' => "dropdown"}
+              %button.btn.btn-primary.dropdown-toggle{title: "Formes", type:"button", 'data-toggle' => "dropdown"}
                 %i.fa.fa-cube
                 %span.caret
               %ul.dropdown-menu
@@ -55,7 +64,7 @@
               %button.btn.btn-default.tool-undo{title: "Annuler", type:"button"}
                 %i.fa.fa-undo
               %button.btn.btn-default.tool-print{title: "Imprimer", type: "button"}
-                %i.fa.fa-printer
+                %i.fa.fa-print
 
           .panel-body
             %canvas{width:800, height:600}
