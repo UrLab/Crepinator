@@ -1,7 +1,9 @@
 import Point from './point.js'
+import {Drawable} from './draw.js'
 
-class Shape {
-    constructor(p1, p2){
+class Shape extends Drawable {
+    constructor(p1, p2, isHole=false){
+        super(isHole)
         this.p1 = p1
         this.p2 = p2
     }
@@ -32,10 +34,11 @@ class Shape {
         return true
     }
 
-    draw(ctx){
+    holeDraw(ctx){
         ctx.save()
         ctx.beginPath()
         this._makePath(ctx)
+        ctx.globalCompositeOperation = "destination-out"
         ctx.fill()
         ctx.restore()
     }
@@ -45,7 +48,7 @@ class Shape {
         ctx.beginPath()
         this._makePath(ctx)
         ctx.clip()
-        ctx.drawImage(texture, 0, 0);
+        ctx.drawImage(texture, 0, 0)
         ctx.restore()
     }
 }

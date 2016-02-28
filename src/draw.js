@@ -1,8 +1,23 @@
 import {Point} from './point.js'
 import {Disk} from './shapes.js'
 
-export class Drawing {
-    constructor(firstPoint, size, shape=Disk){
+export class Drawable {
+    constructor(isHole=false){
+        this.isHole = isHole ? true : false
+    }
+
+    draw(ctx, texture){
+        if (this.isHole){
+            this.holeDraw(ctx)
+        } else {
+            this.textureDraw(ctx, texture)
+        }
+    }
+}
+
+export class Drawing extends Drawable {
+    constructor(firstPoint, size, isHole=false, shape=Disk){
+        super(isHole)
         this.points = [firstPoint]
         this.shape = shape
         this.lw = size
@@ -31,15 +46,15 @@ export class Drawing {
     }
 
     area(){
-        return this.points.length*this.lw
+        return this.points.length*this.lw*this.lw
     }
 
     needRedraw(){
         return false
     }
 
-    draw(ctx){
-        this._eachPoint(shape => shape.draw(ctx))
+    holeDraw(ctx){
+        this._eachPoint(shape => shape.holeDraw(ctx))
     }
 
     textureDraw(ctx, tex){

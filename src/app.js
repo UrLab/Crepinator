@@ -3,6 +3,24 @@ import {Point} from './point.js';
 import {Disk, Rect} from './shapes.js';
 import {Drawing} from './draw.js';
 
+const toolset = {
+    rect: pos => new Rect(pos, pos),
+    disk: pos => new Disk(pos, pos),
+    pen14: pos => new Drawing(pos, 14),
+    pen28: pos => new Drawing(pos, 28),
+    pen42: pos => new Drawing(pos, 42),
+    pen56: pos => new Drawing(pos, 56),
+    pen70: pos => new Drawing(pos, 70),
+
+    'rect-o': pos => new Rect(pos, pos, true),
+    'disk-o': pos => new Disk(pos, pos, true),
+    'pen14-o': pos => new Drawing(pos, 14, true),
+    'pen28-o': pos => new Drawing(pos, 28, true),
+    'pen42-o': pos => new Drawing(pos, 42, true),
+    'pen56-o': pos => new Drawing(pos, 56, true),
+    'pen70-o': pos => new Drawing(pos, 70, true),
+}
+
 class PancakeDesigner {
     constructor(root) {
         this.root = root
@@ -28,6 +46,7 @@ class PancakeDesigner {
         
         ['rect', 'disk', 'pen14', 'pen28', 'pen42', 'pen56', 'pen70'].map(t => {
             root.find(`.tool-${t}`).on('click', evt => this.tool = t)
+            root.find(`.tool-${t}-o`).on('click', evt => this.tool = `${t}-o`)
         });
         root.find('.tool-clear').on('click', evt => {
             if (confirm("Effacer le dessin ?")){this.clear()}
@@ -55,7 +74,7 @@ class PancakeDesigner {
     redraw(){
         let ctx = this.ctx()
         ctx.clearRect(0, 0, this.width, this.height)
-        this.shapes.map(s => s.textureDraw(ctx, this.texture))
+        this.shapes.map(s => s.draw(ctx, this.texture))
     }
 
     stl(){
@@ -90,16 +109,8 @@ class PancakeDesigner {
     }
 
     clickDown(evt){
-        let pos = this.getMousePos(evt);
-        switch (this.tool){
-            case "rect":  this.current_shape = new Rect(pos, pos); break;
-            case "disk":  this.current_shape = new Disk(pos, pos); break;
-            case "pen14": this.current_shape = new Drawing(pos, 14); break;
-            case "pen28": this.current_shape = new Drawing(pos, 28); break;
-            case "pen42": this.current_shape = new Drawing(pos, 42); break;
-            case "pen56": this.current_shape = new Drawing(pos, 56); break;
-            case "pen70": this.current_shape = new Drawing(pos, 70); break;
-        }
+        console.log(this.tool)
+        this.current_shape = toolset[this.tool](this.getMousePos(evt))
         this.click = true
     }
 
@@ -122,9 +133,9 @@ class PancakeDesigner {
             if (s.needRedraw()){
                 ctx.clearRect(s.left(), s.top(), s.width(), s.height())
                 this.shapes.filter(k => s.overlap(k))
-                           .map(k => k.textureDraw(ctx, this.texture))
+                           .map(k => k.draw(ctx, this.texture))
             }
-            s.changePoint(pos).textureDraw(ctx, this.texture)
+            s.changePoint(pos).draw(ctx, this.texture)
         }
     }
 }
