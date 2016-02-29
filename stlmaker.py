@@ -97,7 +97,7 @@ def normalize_shapes(shapes, radius):
     lower = [min(s['xmin'] for s in shapes), min(s['ymin'] for s in shapes)]
     upper = [max(s['xmax'] for s in shapes), max(s['ymax'] for s in shapes)]
     d = np.array(upper, dtype=np.float32) - np.array(lower, dtype=np.float32)
-    ratio = radius/(np.linalg.norm(d)/2)
+    ratio = radius/(max(*d)/2)
     center = lower + d/2
 
     print("CENTER:", center, "RATIO:", ratio, "LOWER:", lower, "UPPER:", upper)
