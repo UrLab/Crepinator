@@ -35,10 +35,9 @@ class PancakeDesigner {
                    .then(res => {if (res){but.toggleClass('disabled')}},
                          err => console.error(err))
             but.on('click', evt => {
-                if (confirm("Imprimer la crèpe ?")){
-                    session.call('print', [this.stl()])
-                           .then(res => this.clear(), err => console.error(err))
-                }
+                let name = prompt("Donne un nom à ta crèpe")
+                session.call('print', [name, this.stl()])
+                       .then(res => this.clear(), err => console.error(err))
             })
         }
         conn.open()

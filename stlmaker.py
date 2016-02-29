@@ -93,10 +93,27 @@ def find_largest_polyhedrons(lists_matrix):
     return shapes
 
 
-def process(out, alpha):
+def normalize_shapes(shapes, radius):
+    lower = [min(s['xmin'] for s in shapes), min(s['ymin'] for s in shapes)]
+    upper = [max(s['xmax'] for s in shapes), max(s['ymax'] for s in shapes)]
+    d = np.array(upper, dtype=np.float32) - np.array(lower, dtype=np.float32)
+    ratio = radius/(np.linalg.norm(d)/2)
+    center = lower + d/2
+
+    print("CENTER:", center, "RATIO:", ratio, "LOWER:", lower, "UPPER:", upper)
+
+    def convert_shape(shape):
+        l = ratio * (np.array([shape['xmin'], shape['ymin']]) - center)
+        u = ratio * (np.array([shape['xmax'], shape['ymax']]) - center)
+        return {'xmin': l[0], 'ymin': l[1], 'xmax': u[0], 'ymax': u[1]}
+    return map(convert_shape, shapes)
+
+
+def process(out, alpha, h=1, radius=80):
     shapes = find_largest_polyhedrons(array_to_matrix(alpha))
     stl_header(out, 12*len(shapes))
-    for sh in shapes:
+    for sh in normalize_shapes(shapes, float(radius)):
+        sh['h'] = h
         stl_rec3d(out, **sh)
 
 if __name__ == "__main__":

@@ -1,17 +1,20 @@
 """
-Convert a Slic3r exported config to a minimal config file
+Convert a Slic3r exported bundle config to a minimal config file for
+use in command line.
 """
 
 from ConfigParser import RawConfigParser
 
 
-def load_config(filename='Slic3r_config_bundle.ini'):
+def read_config(filename='Slic3r_config_bundle.ini'):
+    """F*ckin OO-Side-Effect style !"""
     conf = RawConfigParser()
     conf.read(filename)
     return {k: dict(conf.items(k)) for k in conf.sections()}
 
 
 def write_config(conf_dict, filename='slic3r.ini'):
+    """F*ckin OO-Side-Effect style !"""
     config = RawConfigParser()
     for section, pairs in conf_dict.items():
         config.add_section(section)
@@ -30,4 +33,4 @@ def extract_minimal_config(conf_dict):
 
 
 if __name__ == "__main__":
-    write_config(extract_minimal_config(load_config()))
+    write_config(extract_minimal_config(read_config()))
