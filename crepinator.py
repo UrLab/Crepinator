@@ -4,6 +4,7 @@ import subprocess
 from tempfile import mkstemp
 from functools import partial
 from sys import stdout
+from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
 
 import stlmaker
 
@@ -18,10 +19,20 @@ class Slic3rError(Exception):
     pass
 
 
-class Crepinator:
-    def __init__(self, loop=None):
+class Crepinator(ApplicationSession):
+    @asyncio.coroutine
+    def onJoin(self, details):
         self.queue = []
-        self.loop = asyncio.get_event_loop() if loop is None else loop
+        self.loop = asyncio.get_event_loop()
+        asyncio.async(self.mainloop())
+
+        def print_pancake(data):
+            asyncio.async(c.enqueue(data))
+            return True
+
+        yield from self.register(lambda: True, 'ping')
+        yield from self.register(print_pancake, 'print')
+        print("Ready 2go")
 
     @asyncio.coroutine
     def alpha_to_stl(self, alpha):
@@ -78,10 +89,4 @@ class Crepinator:
                 logger.exception("ERROR IN MAINLOOP")
 
 if __name__ == "__main__":
-    import json
-
-    alpha = json.load(open("alpha.json"))
-    c = Crepinator()
-    asyncio.async(c.enqueue(alpha))
-    asyncio.async(c.enqueue(alpha))
-    asyncio.get_event_loop().run_until_complete(asyncio.sleep(10))
+    ApplicationRunner("ws://localhost:8080/ws", "crepinator").run(Crepinator)
