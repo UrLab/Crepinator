@@ -1,0 +1,10 @@
+static/*.js
+static/*.html
+*.gcode
+*.stl
+ve*
+__pycache__
+*.pyc
+*.ini
+.crossbar/*
+.sass-cache
