@@ -13,6 +13,7 @@ class Component(ApplicationSession):
             asyncio.async(c.enqueue(data))
             return True
 
+        yield from self.register(lambda: True, 'ping')
         yield from self.register(print_pancake, 'print')
         print("Ready 2go")
 

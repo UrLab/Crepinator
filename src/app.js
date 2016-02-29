@@ -29,8 +29,12 @@ class PancakeDesigner {
            realm: "crepinator"
         });
         conn.onopen = (session, details) => {
-            root.find('.tool-print').toggleClass('disabled')
-            root.find('.tool-print').on('click', evt => {
+            console.log(details)
+            let but = root.find('.tool-print')
+            session.call('ping')
+                   .then(res => {if (res){but.toggleClass('disabled')}},
+                         err => console.error(err))
+            but.on('click', evt => {
                 if (confirm("Imprimer la crèpe ?")){
                     session.call('print', [this.stl()])
                            .then(res => this.clear(), err => console.error(err))
@@ -38,7 +42,6 @@ class PancakeDesigner {
             })
         }
         conn.open()
-        this.connection = conn
 
         this.root = root
         this.canvas = root.find('canvas')[0]
@@ -125,7 +128,6 @@ class PancakeDesigner {
     }
 
     clickDown(evt){
-        console.log(this.tool)
         this.current_shape = toolset[this.tool](this.getMousePos(evt))
         this.click = true
     }

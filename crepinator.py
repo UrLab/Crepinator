@@ -70,7 +70,7 @@ class Crepinator:
                 else:
                     gcode, self.queue = self.queue[0], self.queue[1:]
                     logger.info("Printing {}".format(gcode))
-                    yield from asyncio.sleep(5)
+                    yield from asyncio.sleep(15)
                     os.unlink(gcode)
                     os.unlink(gcode[:-6]+'.stl')
                     logger.info("Finished printing {}".format(gcode))
