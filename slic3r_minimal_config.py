@@ -15,20 +15,16 @@ def read_config(filename='Slic3r_config_bundle.ini'):
 
 def write_config(conf_dict, filename='slic3r.ini'):
     """F*ckin OO-Side-Effect style !"""
-    config = RawConfigParser()
-    for section, pairs in conf_dict.items():
-        config.add_section(section)
-        for key, val in pairs.items():
-            config.set(section, key, val)
     with open(filename, 'wb') as out:
-        config.write(out)
+        for key, val in conf_dict.items():
+            print >>out, "{} = {}".format(key, val)
 
 
 def extract_minimal_config(conf_dict):
     res = {}
     for key, preset in conf_dict['presets'].items():
         if preset.endswith('.ini'):
-            res[key] = conf_dict[key+':'+preset[:-4]]
+            res.update(conf_dict[key+':'+preset[:-4]])
     return res
 
 
