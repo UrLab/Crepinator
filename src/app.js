@@ -1,7 +1,8 @@
-import $ from 'jquery';
-import {Point} from './point.js';
-import {Disk, Rect} from './shapes.js';
-import {Drawing} from './draw.js';
+import $ from 'jquery'
+import {Point} from './point.js'
+import {Disk, Rect} from './shapes.js'
+import {Drawing} from './draw.js'
+import autobahn from './3rdparty/autobahn.js'
 
 const toolset = {
     rect: pos => new Rect(pos, pos),
@@ -23,6 +24,22 @@ const toolset = {
 
 class PancakeDesigner {
     constructor(root) {
+        let conn = new autobahn.Connection({
+           url: "ws://127.0.0.1:8080/ws",
+           realm: "crepinator"
+        });
+        conn.onopen = (session, details) => {
+            root.find('.tool-print').toggleClass('disabled')
+            root.find('.tool-print').on('click', evt => {
+                if (confirm("Imprimer la crèpe ?")){
+                    session.call('print', [this.stl()])
+                           .then(res => this.clear(), err => console.error(err))
+                }
+            })
+        }
+        conn.open()
+        this.connection = conn
+
         this.root = root
         this.canvas = root.find('canvas')[0]
         this.width = $(this.canvas).attr('width')
@@ -51,9 +68,8 @@ class PancakeDesigner {
         root.find('.tool-clear').on('click', evt => {
             if (confirm("Effacer le dessin ?")){this.clear()}
         })
-        root.find('.tool-print').on('click', evt => this.stl())
         root.find('.tool-undo').on('click', evt => this.undo())
-    
+
         console.info(`Pancake Designer ${this.width}x${this.height} ready !`)
     }
 
@@ -93,7 +109,7 @@ class PancakeDesigner {
             }
             res[i] = k
         }
-        $('#output').text(JSON.stringify(res))
+        return res
     }
 
     print(){
