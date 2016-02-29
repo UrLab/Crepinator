@@ -10,7 +10,7 @@ ${NODE}: package.json
 	npm install
 
 static/app.js: src/*.js ${NODE}
-	npm run build
+	npm run build-prod
 
 static/%.html: src/%.haml
 	haml $< > $@

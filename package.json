@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "scripts": {
         "build": "webpack --progress",
+        "build-prod": "webpack --progress --optimize-minimize --optimize-dedupe --optimize-occurence-order",
         "server": "webpack-dev-server"
     },
     "devDependencies": {
