@@ -5,6 +5,7 @@ from tempfile import mkstemp
 from functools import partial
 from sys import stdout
 from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
+from serial import Serial
 
 import stlmaker
 
@@ -88,6 +89,7 @@ class Crepinator(ApplicationSession):
         pancake.gcode = gcode
         return pancake
 
+    @asyncio.coroutine
     def enqueue(self, pancake):
         yield from self.alpha_to_stl(pancake)
         logger.info("Created 3D model as {}".format(pancake.stl))
@@ -98,6 +100,30 @@ class Crepinator(ApplicationSession):
         self.queue.append(pancake)
         logger.info("Enqueued {}".format(pancake))
 
+    def print_pancake(self, pancake):
+        with Serial("/dev/ttyACM16", 250000) as printer:
+            printer.write("\r\n".encode('ascii'))
+            printer.readline()
+
+            for line in open(pancake.gcode):
+                i = line.find(';')
+                if i >= 0:
+                    line = line[:i]
+                line = line.strip()
+                if line.startswith('M104') or line.startswith('M109'):
+                    continue
+                if line:
+                    printer.write((line + "\r\n").encode('ascii'))
+                    l = printer.readline().decode().strip()
+                    assert l == "ok", l
+
+    @asyncio.coroutine
+    def async_print_pancake(self, pancake):
+        proc = partial(self.print_pancake, pancake)
+        yield from self.loop.run_in_executor(None, proc)
+        pancake.done = True
+
+    @asyncio.coroutine
     def mainloop(self, idle_wait=5):
         while True:
             try:
@@ -107,8 +133,7 @@ class Crepinator(ApplicationSession):
                 else:
                     pancake, self.queue = self.queue[0], self.queue[1:]
                     logger.info("Printing {}".format(pancake))
-                    yield from asyncio.sleep(15)
-                    pancake.done = True
+                    yield from self.async_print_pancake(pancake)
                     os.unlink(pancake.gcode)
                     os.unlink(pancake.stl)
                     logger.info("Finished {}".format(pancake))
