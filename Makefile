@@ -1,7 +1,7 @@
 NODE = node_modules
 BUILD = static/app.js static/index.html
 
-all: ${BUILD}
+all: slic3r.ini ${BUILD}
 
 clean:
 	rm ${BUILD}
@@ -14,3 +14,6 @@ static/app.js: src/*.js src/*.jsx ${NODE}
 
 static/%.html: src/%.haml
 	haml $< > $@
+
+slic3.ini: Slic3r_config_bundle.ini
+	python slic3r_minimal_config.py
