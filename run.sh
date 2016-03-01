@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ve2/bin/honcho start
+make && ve2/bin/honcho start
