@@ -152,11 +152,8 @@ class PancakeDesigner {
             let pos = this.getMousePos(evt),
                 ctx = this.ctx(),
                 s = this.current_shape;
-            if (s.needRedraw()){
-                ctx.clearRect(s.left(), s.top(), s.width(), s.height())
-                this.shapes.filter(k => s.overlap(k))
-                           .map(k => k.draw(ctx, this.texture))
-            }
+            ctx.clearRect(0, 0, this.width, this.height)
+            this.shapes.map(k => k.draw(ctx, this.texture))
             s.changePoint(pos).draw(ctx, this.texture)
         }
     }
