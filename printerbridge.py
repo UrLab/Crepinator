@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 from serial import Serial
 from glob import glob
 
@@ -10,7 +12,10 @@ def repl(port):
             l = P.readline()
 
         while True:
-            line = raw_input(">> ")
+            try:
+                line = raw_input(">> ")
+            except EOFError:
+                return
             i = line.find(';')
             if i >= 0:
                 line = line[:i]

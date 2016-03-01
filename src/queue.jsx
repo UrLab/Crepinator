@@ -1,7 +1,11 @@
 import React from 'react'
 
 class JobView extends React.Component {
-    percent(){return Math.min(100, (this.props.state+1) * 25)}
+    percent(){
+        console.log(this.props)
+        let p = parseInt(25*(this.props.state+this.props.percent/100.0))
+        return Math.min(100, p)
+    }
     progress_klass(){
         var res = "progress-bar "
         switch (this.props.state){

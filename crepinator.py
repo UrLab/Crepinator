@@ -25,6 +25,7 @@ class Pancake:
         self.alpha = alpha
         self.stl, self.gcode = None, None
         self.printing, self.done = False, False
+        self.percent = 0
 
     @property
     def state(self):
@@ -41,11 +42,12 @@ class Pancake:
     def as_dict(self):
         return {
             'name': self.name,
-            'state': self.state
+            'state': self.state,
+            'percent': self.percent,
         }
 
     def __str__(self):
-        return "<Pancake {}: {}>".format(self.name, self.state)
+        return "<Pancake {}: {} {}%>".format(self.name, self.state, self.percent)
 
 
 class Slic3rError(Exception):
@@ -122,21 +124,42 @@ class Crepinator(ApplicationSession):
 
     def print_pancake(self, pancake):
         with Serial(SERIAL_PORT, 250000) as printer:
-            printer.write("\r\n".encode('ascii'))
-            printer.readline()
+            def sync_readline():
+                return printer.readline().decode()
 
-            for line in open(pancake.gcode):
-                i = line.find(';')
-                if i >= 0:
-                    line = line[:i]
-                line = line.strip()
-                # Ignore temperature commands for now
-                if line.startswith('M104') or line.startswith('M109'):
-                    continue
-                if line:
-                    printer.write((line + "\r\n").encode('ascii'))
-                    l = printer.readline().decode().strip()
-                    assert l == "ok", l
+            def async_readline():
+                return self.loop.run_in_executor(None, sync_readline)
+
+            # Consume input buffer
+            printer.write("\r\n".encode('ascii'))
+            l = ""
+            while l.strip() != 'echo:Unknown command: ""':
+                l = yield from async_readline()
+
+            def read_file():
+                # Send lines to printer
+                for line in open(pancake.gcode):
+                    i = line.find(';')
+                    if i >= 0:
+                        line = line[:i]
+                    line = line.strip()
+                    # Ignore temperature commands for now
+                    if line.startswith('M104') or line.startswith('M109'):
+                        continue
+                    if line:
+                        yield line
+
+            lines = list(read_file())
+            last_percent = -1
+            for i, line in enumerate(lines):
+                printer.write((line + "\r\n").encode('ascii'))
+                l = yield from async_readline()
+                assert l.strip() == "ok", l
+                percent = int(100*float(i)/len(lines))
+                if percent != last_percent:
+                    pancake.percent = percent
+                    self.publish_queue()
+                    last_percent = percent
 
     @asyncio.coroutine
     def _mainloop_step(self, idle_wait):
@@ -148,10 +171,9 @@ class Crepinator(ApplicationSession):
             pancake.printing = True
             self.publish_queue()
             logger.info("Printing {}".format(pancake))
-            proc = partial(self.print_pancake, pancake)
 
             try:
-                yield from self.loop.run_in_executor(None, proc)
+                yield from self.print_pancake(pancake)
                 pancake.done = True
                 self.publish_queue()
             except:
