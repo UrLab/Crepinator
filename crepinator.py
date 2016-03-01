@@ -16,22 +16,33 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+SERIAL_PORT = "/dev/ttyACM0"
+
+
 class Pancake:
     def __init__(self, name, alpha):
         self.name = name
         self.alpha = alpha
         self.stl, self.gcode = None, None
-        self.done = False
+        self.printing, self.done = False, False
 
     @property
     def state(self):
         if not self.stl:
-            return "Accepted"
+            return 0
         if not self.gcode:
-            return "Extruded"
+            return 1
+        if not self.printing:
+            return 2
         if not self.done:
-            return "Ready to print"
-        return "Finished"
+            return 3
+        return 4
+
+    def as_dict(self):
+        return {
+            'name': self.name,
+            'state': self.state
+        }
 
     def __str__(self):
         return "<Pancake {}: {}>".format(self.name, self.state)
@@ -55,7 +66,14 @@ class Crepinator(ApplicationSession):
 
         yield from self.register(lambda: True, 'ping')
         yield from self.register(print_pancake, 'print')
+        yield from self.register(self.formatted_queue, 'get-queue')
         logger.info("Ready to go")
+
+    def formatted_queue(self):
+        return [p.as_dict() for p in self.queue]
+
+    def publish_queue(self):
+        self.publish('queue', *self.formatted_queue())
 
     @asyncio.coroutine
     def alpha_to_stl(self, pancake):
@@ -91,17 +109,19 @@ class Crepinator(ApplicationSession):
 
     @asyncio.coroutine
     def enqueue(self, pancake):
+        self.queue.append(pancake)
+        self.publish_queue()
+
         yield from self.alpha_to_stl(pancake)
         logger.info("Created 3D model as {}".format(pancake.stl))
+        self.publish_queue()
 
         yield from self.stl_to_gcode(pancake)
         logger.info("Created gcode as {}".format(pancake.gcode))
-
-        self.queue.append(pancake)
-        logger.info("Enqueued {}".format(pancake))
+        self.publish_queue()
 
     def print_pancake(self, pancake):
-        with Serial("/dev/ttyACM16", 250000) as printer:
+        with Serial(SERIAL_PORT, 250000) as printer:
             printer.write("\r\n".encode('ascii'))
             printer.readline()
 
@@ -110,6 +130,7 @@ class Crepinator(ApplicationSession):
                 if i >= 0:
                     line = line[:i]
                 line = line.strip()
+                # Ignore temperature commands for now
                 if line.startswith('M104') or line.startswith('M109'):
                     continue
                 if line:
@@ -118,27 +139,52 @@ class Crepinator(ApplicationSession):
                     assert l == "ok", l
 
     @asyncio.coroutine
-    def async_print_pancake(self, pancake):
-        proc = partial(self.print_pancake, pancake)
-        yield from self.loop.run_in_executor(None, proc)
-        pancake.done = True
+    def _mainloop_step(self, idle_wait):
+        if len(self.queue) == 0 or self.queue[0].printing or not self.queue[0].gcode:
+            logger.debug("No queued gcode...")
+            yield from asyncio.sleep(idle_wait)
+        else:
+            pancake = self.queue[0]
+            pancake.printing = True
+            self.publish_queue()
+            logger.info("Printing {}".format(pancake))
+            proc = partial(self.print_pancake, pancake)
+
+            try:
+                yield from self.loop.run_in_executor(None, proc)
+                pancake.done = True
+                self.publish_queue()
+            except:
+                logger.exception("Error while printing")
+
+            self.queue = self.queue[1:]
+            self.publish_queue()
+
+            os.unlink(pancake.gcode)
+            os.unlink(pancake.stl)
+            logger.info("Finished {}".format(pancake))
 
     @asyncio.coroutine
     def mainloop(self, idle_wait=5):
         while True:
             try:
-                if len(self.queue) == 0:
-                    logger.debug("No queued gcode...")
-                    yield from asyncio.sleep(idle_wait)
-                else:
-                    pancake, self.queue = self.queue[0], self.queue[1:]
-                    logger.info("Printing {}".format(pancake))
-                    yield from self.async_print_pancake(pancake)
-                    os.unlink(pancake.gcode)
-                    os.unlink(pancake.stl)
-                    logger.info("Finished {}".format(pancake))
+                yield from self._mainloop_step(idle_wait)
             except Exception:
                 logger.exception("ERROR IN MAINLOOP")
+
+
+class Fakinator(Crepinator):
+    def alpha_to_stl(self, pancake):
+        yield from asyncio.sleep(5)
+        pancake.stl = "lolilol"
+
+    def stl_to_gcode(self, pancake):
+        yield from asyncio.sleep(5)
+        pancake.gcode = "lolilol"
+
+    def print_pancake(self, pancake):
+        from time import sleep
+        sleep(15)
 
 if __name__ == "__main__":
     ApplicationRunner("ws://localhost:8080/ws", "crepinator").run(Crepinator)

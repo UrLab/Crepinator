@@ -9,8 +9,8 @@ clean:
 ${NODE}: package.json
 	npm install
 
-static/app.js: src/*.js ${NODE}
-	npm run build-prod
+static/app.js: src/*.js src/*.jsx ${NODE}
+	npm run build
 
 static/%.html: src/%.haml
 	haml $< > $@

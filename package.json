@@ -12,6 +12,9 @@
         "babel-polyfill": "",
         "babel-plugin-transform-runtime": "",
         "babel-loader": "",
+        "babel-preset-react": "",
+        "react": "",
+        "react-dom": "",
         "jquery": "",
         "webpack": "",
         "webpack-dev-server": ""

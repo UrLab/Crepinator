@@ -12,4 +12,4 @@
 
 # Run
 
-`./run.sh`
+`make && ./run.sh`

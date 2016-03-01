@@ -3,6 +3,9 @@ import {Point} from './point.js'
 import {Disk, Rect} from './shapes.js'
 import {Drawing} from './draw.js'
 import autobahn from './3rdparty/autobahn.js'
+import {QueueView} from './queue.jsx'
+import ReactDOM from 'react-dom'
+import React from 'react'
 
 const toolset = {
     rect: pos => new Rect(pos, pos),
@@ -28,17 +31,19 @@ class PancakeDesigner {
            url: "ws://127.0.0.1:8080/ws",
            realm: "crepinator"
         });
+
         conn.onopen = (session, details) => {
-            console.log(details)
             let but = root.find('.tool-print')
             session.call('ping')
-                   .then(res => {if (res){but.toggleClass('disabled')}},
+                   .then(res => {if (res){but.removeClass('disabled')}},
                          err => console.error(err))
             but.on('click', evt => {
                 let name = prompt("Donne un nom à ta crèpe")
                 session.call('print', [name, this.stl()])
                        .then(res => this.clear(), err => console.error(err))
             })
+            ReactDOM.render(React.createElement(QueueView, {session: session}),
+                            root.find('.queue').get(0))
         }
         conn.open()
 
