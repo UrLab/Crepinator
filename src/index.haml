@@ -23,39 +23,18 @@
                 %i.fa.fa-pencil
                 %span.caret
               %ul.dropdown-menu
-                %li.tool-pen14
-                  %a{href:"#"}
-                    %i.fa.fa-circle
-                %li.tool-pen28
-                  %a{href:"#"}
-                    %i.fa.fa-circle.fa-2x
-                %li.tool-pen42
-                  %a{href:"#"}
-                    %i.fa.fa-circle.fa-3x
-                %li.tool-pen56
-                  %a{href:"#"}
-                    %i.fa.fa-circle.fa-4x
-                %li.tool-pen70
-                  %a{href:"#"}
-                    %i.fa.fa-circle.fa-5x
+                -1.upto 5 do |i|
+                  %li{class:"tool-pen#{14*i}"}
+                    %a{href:"#"}
+                      %i.fa.fa-circle{class:(i>1) ? "fa-#{i}x" : ""}
+                      Crayon
                 %li.divider{role:"separator"}
-                %li.tool-pen14-o
-                  %a{href:"#"}
-                    %i.fa.fa-circle-o
-                %li.tool-pen28-o
-                  %a{href:"#"}
-                    %i.fa.fa-circle-o.fa-2x
-                %li.tool-pen42-o
-                  %a{href:"#"}
-                    %i.fa.fa-circle-o.fa-3x
-                %li.tool-pen56-o
-                  %a{href:"#"}
-                    %i.fa.fa-circle-o.fa-4x
-                %li.tool-pen70-o
-                  %a{href:"#"}
-                    %i.fa.fa-circle-o.fa-5x
+                -1.upto 5 do |i|
+                  %li{class:"tool-pen#{14*i}-o"}
+                    %a{href:"#"}
+                      %i.fa.fa-circle-o{class:(i>1) ? "fa-#{i}x" : ""}
+                      Gomme
 
-            
             .btn-group{role:"group"}
               %button.btn.btn-primary.dropdown-toggle{title: "Formes", type:"button", 'data-toggle' => "dropdown"}
                 %i.fa.fa-cube
@@ -73,11 +52,11 @@
                 %li.tool-disk-o
                   %a{href:"#"}
                     %i.fa.fa-circle-o
-                    Rond creux
+                    Gomme rond
                 %li.tool-rect-o
                   %a{href:"#"}
                     %i.fa.fa-square-o
-                    Rectangle creux
+                    Gomme rectangle
 
             .btn-group{role:"group"}
               %button.btn.btn-danger.tool-clear{title: "Effacer", type:"button"}
