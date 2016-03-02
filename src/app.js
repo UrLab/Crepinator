@@ -76,6 +76,11 @@ class PancakeDesigner {
             if (confirm("Effacer le dessin ?")){this.clear()}
         })
         root.find('.tool-undo').on('click', evt => this.undo())
+        $(window).keydown(evt => {
+            if (evt.keyCode == 90 && evt.ctrlKey){
+                this.undo()
+            }
+        })
 
         console.info(`Pancake Designer ${this.width}x${this.height} ready !`)
     }

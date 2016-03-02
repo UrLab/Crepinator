@@ -2,7 +2,6 @@ import React from 'react'
 
 class JobView extends React.Component {
     percent(){
-        console.log(this.props)
         let p = parseInt(25*(this.props.state+this.props.percent/100.0))
         return Math.min(100, p)
     }
@@ -59,8 +58,6 @@ export class QueueView extends React.Component {
     render(){
         let content = this.state.queue.map(
             x => <li className="list-group-item"><JobView {...x}/></li>)
-        return <ul className="list-group">
-            {content}
-        </ul>
+        return <ul className="list-group">{content}</ul>
     }
 }
