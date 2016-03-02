@@ -205,8 +205,10 @@ class Fakinator(Crepinator):
         pancake.gcode = "lolilol"
 
     def print_pancake(self, pancake):
-        from time import sleep
-        sleep(15)
+        for i in range(11):
+            pancake.percent = 10*i
+            self.publish_queue()
+            yield from asyncio.sleep(1)
 
 if __name__ == "__main__":
     ApplicationRunner("ws://localhost:8080/ws", "crepinator").run(Crepinator)
