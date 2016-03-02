@@ -5,6 +5,7 @@ from glob import glob
 
 
 def repl(port):
+    print("Opening {}".format(port))
     with Serial(port, 250000) as P:
         P.write("\r\n")
         l = ""
