@@ -37,11 +37,13 @@ class PancakeDesigner {
             session.call('ping')
                    .then(res => {if (res){but.removeClass('disabled')}},
                          err => console.error(err))
+
             but.on('click', evt => {
                 let name = prompt("Donne un nom à ta crèpe")
                 session.call('print', [name, this.stl()])
                        .then(res => this.clear(), err => console.error(err))
             })
+            
             ReactDOM.render(React.createElement(QueueView, {session: session}),
                             root.find('.queue').get(0))
         }

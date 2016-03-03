@@ -27,7 +27,7 @@ class JobView extends React.Component {
             case 0: return "Extrusion du volume"
             case 1: return "Tranchage"
             case 2: return "En attente d'impression"
-            case 3: return "Impression"
+            case 3: return `Impression (${this.props.percent}%)`
             default: return "Terminé"
         }
     }

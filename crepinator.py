@@ -161,13 +161,19 @@ class Crepinator(ApplicationSession):
                     self.publish_queue()
                     last_percent = percent
 
+    def cleanup_pancake(self, pancake):
+        os.unlink(pancake.gcode)
+        os.unlink(pancake.stl)
+        logger.info("Finished {}".format(pancake))
+
     @asyncio.coroutine
     def _mainloop_step(self, idle_wait):
-        if len(self.queue) == 0 or self.queue[0].printing or not self.queue[0].gcode:
+        Q = self.queue
+        if len(Q) == 0 or Q[0].printing or not Q[0].gcode:
             logger.debug("No queued gcode...")
             yield from asyncio.sleep(idle_wait)
         else:
-            pancake = self.queue[0]
+            pancake = Q[0]
             pancake.printing = True
             self.publish_queue()
             logger.info("Printing {}".format(pancake))
@@ -179,12 +185,10 @@ class Crepinator(ApplicationSession):
             except:
                 logger.exception("Error while printing")
 
+            self.cleanup_pancake(pancake)
+            yield from asyncio.sleep(1)
             self.queue = self.queue[1:]
             self.publish_queue()
-
-            os.unlink(pancake.gcode)
-            os.unlink(pancake.stl)
-            logger.info("Finished {}".format(pancake))
 
     @asyncio.coroutine
     def mainloop(self, idle_wait=5):
@@ -198,17 +202,20 @@ class Crepinator(ApplicationSession):
 class Fakinator(Crepinator):
     def alpha_to_stl(self, pancake):
         yield from asyncio.sleep(5)
-        pancake.stl = "lolilol"
+        pancake.stl = pancake.name + '.stl'
 
     def stl_to_gcode(self, pancake):
         yield from asyncio.sleep(5)
-        pancake.gcode = "lolilol"
+        pancake.gcode = pancake.name + '.gcode'
 
     def print_pancake(self, pancake):
         for i in range(11):
             pancake.percent = 10*i
             self.publish_queue()
             yield from asyncio.sleep(1)
+
+    def cleanup_pancake(self, pancake):
+        logger.info("Cleanup {}".format(pancake))
 
 if __name__ == "__main__":
     ApplicationRunner("ws://localhost:8080/ws", "crepinator").run(Crepinator)
