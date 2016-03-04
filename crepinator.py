@@ -133,7 +133,7 @@ class Crepinator(ApplicationSession):
             yield from asyncio.sleep(1)
 
             # Consume input buffer
-            printer.write("\r\n".encode('ascii'))
+            printer.write(" \r\n".encode('ascii'))
             l = ""
             while l.strip() != 'ok':
                 l = yield from async_readline()
