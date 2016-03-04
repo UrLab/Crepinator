@@ -130,6 +130,11 @@ class Crepinator(ApplicationSession):
             def async_readline():
                 return self.loop.run_in_executor(None, sync_readline)
 
+            def async_command(cmd):
+                printer.write((cmd + '\r\n').encode('ascii'))
+                line = yield from async_readline()
+                assert line == "ok"
+
             yield from asyncio.sleep(1)
 
             # Consume input buffer
@@ -154,14 +159,16 @@ class Crepinator(ApplicationSession):
             lines = list(read_file())
             last_percent = -1
             for i, line in enumerate(lines):
-                printer.write((line + "\r\n").encode('ascii'))
-                l = yield from async_readline()
-                assert l.strip() == "ok", l
+                yield from async_command(line)
                 percent = int(100*float(i)/len(lines))
                 if percent != last_percent:
                     pancake.percent = percent
                     self.publish_queue()
                     last_percent = percent
+            pancake.done = True
+            self.publish_queue()
+            yield from async_command("G28")
+            yield from async_command("M84")
 
     def cleanup_pancake(self, pancake):
         os.unlink(pancake.gcode)
@@ -182,13 +189,10 @@ class Crepinator(ApplicationSession):
 
             try:
                 yield from self.print_pancake(pancake)
-                pancake.done = True
-                self.publish_queue()
             except:
                 logger.exception("Error while printing")
 
             self.cleanup_pancake(pancake)
-            yield from asyncio.sleep(1)
             self.queue = self.queue[1:]
             self.publish_queue()
 
