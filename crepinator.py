@@ -130,10 +130,12 @@ class Crepinator(ApplicationSession):
             def async_readline():
                 return self.loop.run_in_executor(None, sync_readline)
 
+            yield from asyncio.sleep(1)
+
             # Consume input buffer
             printer.write("\r\n".encode('ascii'))
             l = ""
-            while l.strip() != 'echo:Unknown command: ""':
+            while l.strip() != 'ok':
                 l = yield from async_readline()
 
             def read_file():

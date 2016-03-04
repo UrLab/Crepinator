@@ -1,20 +1,22 @@
-#!/usr/bin/env python2
+#!./ve3/bin/python
 
 from serial import Serial
 from glob import glob
+from time import sleep
 
 
 def repl(port):
-    print("Opening {}".format(port))
     with Serial(port, 250000) as P:
-        P.write("\r\n")
+        print("Opening {}".format(port))
+        sleep(1)
+        P.write(" \r\n".encode('ascii'))
         l = ""
-        while l.strip() != 'echo:Unknown command: ""':
-            l = P.readline()
+        while l.strip() != 'ok':
+            l = P.readline().decode('ascii')
 
         while True:
             try:
-                line = raw_input(">> ")
+                line = input(">> ")
             except EOFError:
                 return
             i = line.find(';')
@@ -22,9 +24,9 @@ def repl(port):
                 line = line[:i]
             line = line.strip()
             if line:
-                P.write(line + "\r\n")
-                l = P.readline().strip()
-                print "--->", l
+                P.write((line + "\r\n").encode('ascii'))
+                l = P.readline().decode('ascii').strip()
+                print("--->", l)
                 assert l == "ok", l
 
 
