@@ -2,9 +2,14 @@
 
 # Requirements
 
-* python, virtualenv
+* python2, python3, virtualenv
 * haml, sass
 * node, npm
+
+Example on Debian / Ubuntu:
+
+    $ sudo apt-get install python-dev python-virtualenv python3 ruby nodejs libnacl-dev libffi-dev
+    $ sudo gem install haml sass
 
 # Install
 

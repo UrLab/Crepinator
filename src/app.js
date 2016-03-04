@@ -28,7 +28,7 @@ const toolset = {
 class PancakeDesigner {
     constructor(root) {
         let conn = new autobahn.Connection({
-           url: "ws://127.0.0.1:8080/ws",
+           url: `ws://${window.location.host}/ws`,
            realm: "crepinator"
         });
 
