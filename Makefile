@@ -15,5 +15,5 @@ static/app.js: src/*.js src/*.jsx ${NODE}
 static/%.html: src/%.haml
 	haml $< > $@
 
-slic3.ini: Slic3r_config_bundle.ini
+slic3r.ini: Slic3r_config_bundle.ini
 	python slic3r_minimal_config.py
