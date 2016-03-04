@@ -133,7 +133,7 @@ class Crepinator(ApplicationSession):
             def async_command(cmd):
                 printer.write((cmd + '\r\n').encode('ascii'))
                 line = yield from async_readline()
-                assert line == "ok"
+                assert line.strip() == "ok"
 
             yield from asyncio.sleep(1)
 
