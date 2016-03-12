@@ -85,7 +85,7 @@ class Crepinator(ApplicationSession):
         """
         fd, stl = mkstemp(prefix='crepinator.', suffix='.stl')
         out = os.fdopen(fd, 'wb')
-        proc = partial(stlmaker.process, out, pancake.alpha, 2)
+        proc = partial(stlmaker.process, out, pancake.alpha, h=2, radius=55)
         yield from self.loop.run_in_executor(None, proc)
         out.close()
         pancake.stl = stl
