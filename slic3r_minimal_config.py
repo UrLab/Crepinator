@@ -16,7 +16,8 @@ def read_config(filename='Slic3r_config_bundle.ini'):
 def write_config(conf_dict, filename='slic3r.ini'):
     """F*ckin OO-Side-Effect style !"""
     with open(filename, 'wb') as out:
-        for key, val in conf_dict.items():
+        for key in sorted(conf_dict.keys()):
+            val = conf_dict[key]
             print >>out, "{} = {}".format(key, val)
 
 
