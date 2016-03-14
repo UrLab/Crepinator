@@ -1,6 +1,7 @@
 import os
 import asyncio
 import subprocess
+from glob import glob
 from tempfile import mkstemp
 from functools import partial
 from sys import stdout
@@ -16,7 +17,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-SERIAL_PORT = "/dev/ttyACM0"
+SERIAL_PORT = glob("/dev/ttyACM*")[0]
 
 
 class Pancake:
