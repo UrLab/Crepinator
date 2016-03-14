@@ -38,14 +38,13 @@ class PancakeDesigner {
                    .then(res => {if (res){but.removeClass('disabled')}},
                          err => console.error(err))
 
-            but.on('click', evt => {
-                let name = prompt("Donne un nom à ta crèpe")
-                but.addClass('disabled')
-                session.call('print', [name, this.stl()])
-                       .then(res => {this.clear(); but.removeClass('disabled');},
-                             err => console.error(err))
+            $(window).keydown(evt => {
+                if (evt.keyCode == 119) {
+                    session.call('print', ["Une crepe", this.stl()])
+                           .then(res => this.clear(),
+                                 err => console.error(err))
+                }
             })
-            
             ReactDOM.render(React.createElement(QueueView, {session: session}),
                             root.find('.queue').get(0))
         }
