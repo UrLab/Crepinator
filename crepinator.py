@@ -27,6 +27,10 @@ class Pancake:
         self.stl, self.gcode = None, None
         self.printing, self.done = False, False
         self.percent = 0
+        matrix = stlmaker.np.array(stlmaker.array_to_matrix(alpha))
+        h, w = matrix.shape
+        rw, rh = w/16, h/16
+        self.matrix16 = [[matrix[int(i*rh)][int(j*rw)] for j in range(16)] for i in range(16)]
 
     @property
     def state(self):
@@ -45,6 +49,7 @@ class Pancake:
             'name': self.name,
             'state': self.state,
             'percent': self.percent,
+            'preview': self.matrix16,
         }
 
     def __str__(self):
